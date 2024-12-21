@@ -84,7 +84,7 @@ void task2HumanPyramid() {
 
 
 // Recursive function to validate parentheses
-int task3ParenthesisValidator(int first, int second, int third, int forth, int invalid, int last) {
+int task3ParenthesisValidator(int first, int second, int third, int forth, int invalid, char lastChar) {
     char c;
     if (scanf("%c", &c) != 1 || c == '\n') {
         // Base case: End of input
@@ -92,50 +92,39 @@ int task3ParenthesisValidator(int first, int second, int third, int forth, int i
     }
 
     // Handle opening parentheses
-    if (c == '<') return task3ParenthesisValidator(first + 1, second, third, forth, invalid, last);
-    if (c == '(') return task3ParenthesisValidator(first, second + 1, third, forth, invalid, last);
-    if (c == '[') return task3ParenthesisValidator(first, second, third + 1, forth, invalid, last);
-    if (c == '{') return task3ParenthesisValidator(first, second, third, forth + 1, invalid, last);
+    if (c == '<') return task3ParenthesisValidator(first + 1, second, third, forth, invalid, '<');
+    if (c == '(') return task3ParenthesisValidator(first, second + 1, third, forth, invalid, '(');
+    if (c == '[') return task3ParenthesisValidator(first, second, third + 1, forth, invalid, '[');
+    if (c == '{') return task3ParenthesisValidator(first, second, third, forth + 1, invalid, '{');
 
     // Handle closing parentheses
     if (c == '>') {
-        if (last == '<' || last == 0) {
-            if (first > 0) {
-                return task3ParenthesisValidator(first - 1, second, third, forth, invalid, last);
-            }
+        if (lastChar == '<' || lastChar == 0) {
+            if (first > 0) return task3ParenthesisValidator(first - 1, second, third, forth, invalid, 0);
         }
-                return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
-
+        return task3ParenthesisValidator(first, second, third, forth, invalid + 1, lastChar);
     }
     if (c == ')') {
-        if (last == '(' || last == 0) {
-            if (second > 0) {
-                return task3ParenthesisValidator(first, second - 1, third, forth, invalid, last);
-            }
+        if (lastChar == '(' || lastChar == 0) {
+            if (second > 0) return task3ParenthesisValidator(first, second - 1, third, forth, invalid, 0);
         }
-        return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
-        }
-
+        return task3ParenthesisValidator(first, second, third, forth, invalid + 1, lastChar);
+    }
     if (c == ']') {
-        if (last == '[' || last == 0) {
-            if (third > 0) {
-                return task3ParenthesisValidator(first, second, third - 1, forth, invalid, last);
-            }
+        if (lastChar == '[' || lastChar == 0) {
+            if (third > 0) return task3ParenthesisValidator(first, second, third - 1, forth, invalid, 0);
         }
-            return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
-        }
-
+        return task3ParenthesisValidator(first, second, third, forth, invalid + 1, lastChar);
+    }
     if (c == '}') {
-        if (last == '{' || last == 0) {
-            if (forth > 0) {
-                return task3ParenthesisValidator(first, second, third, forth - 1, invalid, last);
-            }
+        if (lastChar == '{' || lastChar == 0) {
+            if (forth > 0) return task3ParenthesisValidator(first, second, third, forth - 1, invalid, 0);
         }
-            return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
+        return task3ParenthesisValidator(first, second, third, forth, invalid + 1, lastChar);
     }
 
     // Ignore non-parenthesis characters
-    return task3ParenthesisValidator(first, second, third, forth, invalid, last);
+    return task3ParenthesisValidator(first, second, third, forth, invalid, lastChar);
 }
 
 
@@ -171,7 +160,7 @@ int main()
             case 3: {
                     printf("Please enter a term for validation:\n");
                     scanf(" ");
-                    int isClosed=task3ParenthesisValidator(0,0,0,0,0,0);
+                    int isClosed=task3ParenthesisValidator(0,0,0,0,0, 0);
                     if (isClosed==1) {
                         printf("The parentheses are balanced correctly.\n");
                     } else {
