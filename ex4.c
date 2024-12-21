@@ -81,73 +81,67 @@ void task2HumanPyramid() {
     }
 }
 
-
+// Helper function to determine if a character is an opening parenthesis
 int isOpening(char c) {
-    return c == '(' || c == '{' || c == '[' || c == '<';
+    return c == '(' || c == '[' || c == '{' || c == '<';
 }
 
+// Helper function to determine if a character is a closing parenthesis
 int isClosing(char c) {
-    return c == ')' || c == '}' || c == ']' || c == '>';
+    return c == ')' || c == ']' || c == '}' || c == '>';
 }
 
+// Helper function to check if an opening and closing parenthesis match
 int isMatching(char open, char close) {
     return (open == '(' && close == ')') ||
-           (open == '{' && close == '}') ||
            (open == '[' && close == ']') ||
+           (open == '{' && close == '}') ||
            (open == '<' && close == '>');
 }
 
-// The recursive function
-int isBalanced(int stack[], int stackIndex) {
+// Recursive function to validate parentheses
+int validateParentheses(char lastOpen, int depth) {
     char c;
 
-    // Read character by character
-    if (scanf("%c", &c) != 1 || c == '\n') { // Stops at newline or EOF
-        return stackIndex == 0; // If the stack is empty, parentheses are balanced
+    // Read one character from input
+    if (scanf("%c", &c) != 1 || c == '\n') {
+        // If end of input or newline is reached, return whether depth is zero
+        return depth == 0;
     }
 
     if (isOpening(c)) {
-        // Push the opening parenthesis onto the stack
-        stack[stackIndex] = c;
-        return isBalanced(stack, stackIndex + 1);
-    }
-
-    if (isClosing(c)) {
-        // Check if it matches the last opening parenthesis
-        if (stackIndex == 0 || !isMatching(stack[stackIndex - 1], c)) {
-            return 0; // Unmatched closing parenthesis
+        // If the character is an opening parenthesis, recurse deeper
+        if (!validateParentheses(c, depth + 1)) {
+            return 0; // Unbalanced in deeper recursion
         }
-        return isBalanced(stack, stackIndex - 1); // Pop from the stack
+    } else if (isClosing(c)) {
+        // If the character is a closing parenthesis, check if it matches the last open
+        if (depth == 0 || !isMatching(lastOpen, c)) {
+            return 0; // Mismatch or unmatched closing parenthesis
+        }
+        return 1; // Successfully matched this level
     }
 
-    // Ignore non-parenthesis characters
-    return isBalanced(stack, stackIndex);
+    // Continue reading characters
+    return validateParentheses(lastOpen, depth);
 }
 
-void task3ParenthesisValidator() {
-    int stack[1000000]; // Buffer for the recursive function
+// Main function to handle the task
+void task3ParenthesisValidation() {
     char c;
 
     // Clear any leftover characters from the menu selection
     while (scanf("%c", &c) == 1 && c != '\n'); // Clear leftover input after menu choice
 
-    printf("Please enter a term for validation: \n");
+    printf("Please enter a term for validation:\n");
 
-    // Call the recursive function to validate the input
-    if (isBalanced(stack, 0)) {
-        printf("\nThe parentheses are balanced correctly.\n");
+    // Start validation with depth 0 and no initial lastOpen
+    if (validateParentheses(0, 0)) {
+        printf("The parentheses are balanced correctly.\n");
     } else {
-        printf("\nThe parentheses are not balanced correctly.\n");
+        printf("The parentheses are not balanced correctly.\n");
     }
 }
-
-
-
-
-
-
-
-
 
 // void task4QueensBattle();
 // void task5CrosswordGenerator();
@@ -179,7 +173,7 @@ int main()
                  task2HumanPyramid();
                 break;
             case 3:
-                 task3ParenthesisValidator();
+                 task3ParenthesisValidation();
                  break;
             // case 4:
             //     task4QueensBattle();
