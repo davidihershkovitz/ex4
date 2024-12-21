@@ -84,44 +84,59 @@ void task2HumanPyramid() {
 
 
 // Recursive function to validate parentheses
-int task3ParenthesisValidator(int open1, int open2, int open3, int open4, int error, int last) {
+int task3ParenthesisValidator(int first, int second, int third, int forth, int invalid, int last) {
     char c;
     if (scanf("%c", &c) != 1 || c == '\n') {
         // Base case: End of input
-        return (open1 == 0 && open2 == 0 && open3 == 0 && open4 == 0 && error == 0) ? 1 : 0;
+        return (first == 0 && second == 0 && third == 0 && forth == 0 && invalid == 0) ? 1 : 0;
     }
 
     // Handle opening parentheses
-    if (c == '<') return task3ParenthesisValidator(open1 + 1, open2, open3, open4, error, last);
-    if (c == '(') return task3ParenthesisValidator(open1, open2 + 1, open3, open4, error, last);
-    if (c == '[') return task3ParenthesisValidator(open1, open2, open3 + 1, open4, error, last);
-    if (c == '{') return task3ParenthesisValidator(open1, open2, open3, open4 + 1, error, last);
+    if (c == '<') return task3ParenthesisValidator(first + 1, second, third, forth, invalid, last);
+    if (c == '(') return task3ParenthesisValidator(first, second + 1, third, forth, invalid, last);
+    if (c == '[') return task3ParenthesisValidator(first, second, third + 1, forth, invalid, last);
+    if (c == '{') return task3ParenthesisValidator(first, second, third, forth + 1, invalid, last);
 
     // Handle closing parentheses
     if (c == '>') {
-        if (open1 > 0) return task3ParenthesisValidator(open1 - 1, open2, open3, open4, error, last);
-        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
+        if (last == '<' || last == 0) {
+            if (first > 0) {
+                return task3ParenthesisValidator(first - 1, second, third, forth, invalid, last);
+            }
+        }
+                return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
+
     }
     if (c == ')') {
-        if (open2 > 0) return task3ParenthesisValidator(open1, open2 - 1, open3, open4, error, last);
-        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
-    }
+        if (last == '(' || last == 0) {
+            if (second > 0) {
+                return task3ParenthesisValidator(first, second - 1, third, forth, invalid, last);
+            }
+        }
+        return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
+        }
+
     if (c == ']') {
-        if (open3 > 0) return task3ParenthesisValidator(open1, open2, open3 - 1, open4, error, last);
-        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
-    }
+        if (last == '[' || last == 0) {
+            if (third > 0) {
+                return task3ParenthesisValidator(first, second, third - 1, forth, invalid, last);
+            }
+        }
+            return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
+        }
+
     if (c == '}') {
-        if (open4 > 0) return task3ParenthesisValidator(open1, open2, open3, open4 - 1, error, last);
-        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
+        if (last == '{' || last == 0) {
+            if (forth > 0) {
+                return task3ParenthesisValidator(first, second, third, forth - 1, invalid, last);
+            }
+        }
+            return task3ParenthesisValidator(first, second, third, forth, invalid + 1, last);
     }
 
     // Ignore non-parenthesis characters
-    return task3ParenthesisValidator(open1, open2, open3, open4, error, last);
+    return task3ParenthesisValidator(first, second, third, forth, invalid, last);
 }
-
-
-
-
 
 
 // void task4QueensBattle();
@@ -157,7 +172,6 @@ int main()
                     printf("Please enter a term for validation:\n");
                     scanf(" ");
                     int isClosed=task3ParenthesisValidator(0,0,0,0,0,0);
-
                     if (isClosed==1) {
                         printf("The parentheses are balanced correctly.\n");
                     } else {
