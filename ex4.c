@@ -80,68 +80,82 @@ void task2HumanPyramid() {
         printf("\n");
     }
 }
-
-// Helper function to determine if a character is an opening parenthesis
-int isOpening(char c) {
-    return c == '(' || c == '[' || c == '{' || c == '<';
-}
-
-// Helper function to determine if a character is a closing parenthesis
-int isClosing(char c) {
-    return c == ')' || c == ']' || c == '}' || c == '>';
-}
-
-// Helper function to check if an opening and closing parenthesis match
-int isMatching(char open, char close) {
-    return (open == '(' && close == ')') ||
-           (open == '[' && close == ']') ||
-           (open == '{' && close == '}') ||
-           (open == '<' && close == '>');
-}
-
-// Recursive function to validate parentheses
-int validateParentheses(char lastOpen, int depth) {
+int isBalanced(int firstOpen, int secondOpen, int thirdOpen, int forthOpen, int notValid, char lastOpen) {
     char c;
-
-    // Read one character from input
-    if (scanf("%c", &c) != 1 || c == '\n') {
-        // If end of input or newline is reached, return whether depth is zero
-        return depth == 0;
+    scanf("%c", &c);
+    if (c == '\n') {
+        if (firstOpen == 0 && secondOpen == 0 && thirdOpen == 0 && forthOpen == 0 && notValid == 0 && lastOpen == 0)
+            return 1;
+        return 0;
     }
 
-    if (isOpening(c)) {
-        // If the character is an opening parenthesis, recurse deeper
-        if (!validateParentheses(c, depth + 1)) {
-            return 0; // Unbalanced in deeper recursion
-        }
-    } else if (isClosing(c)) {
-        // If the character is a closing parenthesis, check if it matches the last open
-        if (depth == 0 || !isMatching(lastOpen, c)) {
-            return 0; // Mismatch or unmatched closing parenthesis
-        }
-        return 1; // Successfully matched this level
+    if (c == '<') {
+        return isBalanced(firstOpen + 1, secondOpen, thirdOpen, forthOpen, notValid, c);
+    }
+    if (c == '(') {
+        return isBalanced(firstOpen, secondOpen + 1, thirdOpen, forthOpen, notValid, c);
+    }
+    if (c == '[') {
+        return isBalanced(firstOpen, secondOpen, thirdOpen + 1, forthOpen, notValid, c);
+    }
+    if (c == '{') {
+        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen + 1, notValid, c);
     }
 
-    // Continue reading characters
-    return validateParentheses(lastOpen, depth);
+    if (c == '>') {
+        if (lastOpen == '<' || lastOpen == 0) {
+            if (firstOpen > 0) {
+                return isBalanced(firstOpen - 1, secondOpen, thirdOpen, forthOpen, notValid, 0);
+            }
+        }
+        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+    }
+    if (c == ')') {
+        if (lastOpen == '(' || lastOpen == 0) {
+            if (secondOpen > 0) {
+                return isBalanced(firstOpen, secondOpen - 1, thirdOpen, forthOpen, notValid, 0);
+            }
+        }
+        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+    }
+    if (c == ']') {
+        if (lastOpen == '[' || lastOpen == 0) {
+            if (thirdOpen > 0) {
+                return isBalanced(firstOpen, secondOpen, thirdOpen - 1, forthOpen, notValid, 0);
+            }
+        }
+        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+    }
+    if (c == '}') {
+        if (lastOpen == '{' || lastOpen == 0) {
+            if (forthOpen > 0) {
+                return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen - 1, notValid, 0);
+            }
+        }
+        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+    }
+
+    return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid, lastOpen);
 }
 
-// Main function to handle the task
 void task3ParenthesisValidation() {
-    char c;
-
-    // Clear any leftover characters from the menu selection
-    while (scanf("%c", &c) == 1 && c != '\n'); // Clear leftover input after menu choice
-
     printf("Please enter a term for validation:\n");
 
-    // Start validation with depth 0 and no initial lastOpen
-    if (validateParentheses(0, 0)) {
+    // Discard leftover newline characters in the buffer
+    char c;
+    while (scanf("%c", &c) == 1 && c == '\n');
+
+    // Start the validation
+    int result = isBalanced(0, 0, 0, 0, 0, 0);
+
+    if (result == 1) {
         printf("The parentheses are balanced correctly.\n");
     } else {
         printf("The parentheses are not balanced correctly.\n");
     }
 }
+
+
 
 // void task4QueensBattle();
 // void task5CrosswordGenerator();
