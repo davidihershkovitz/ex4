@@ -80,80 +80,47 @@ void task2HumanPyramid() {
         printf("\n");
     }
 }
-int isBalanced(int firstOpen, int secondOpen, int thirdOpen, int forthOpen, int notValid, char lastOpen) {
+
+
+
+// Recursive function to validate parentheses
+int task3ParenthesisValidator(int open1, int open2, int open3, int open4, int error, int last) {
     char c;
-    scanf("%c", &c);
-    if (c == '\n') {
-        if (firstOpen == 0 && secondOpen == 0 && thirdOpen == 0 && forthOpen == 0 && notValid == 0 && lastOpen == 0)
-            return 1;
-        return 0;
+    if (scanf("%c", &c) != 1 || c == '\n') {
+        // Base case: End of input
+        return (open1 == 0 && open2 == 0 && open3 == 0 && open4 == 0 && error == 0) ? 1 : 0;
     }
 
-    if (c == '<') {
-        return isBalanced(firstOpen + 1, secondOpen, thirdOpen, forthOpen, notValid, c);
-    }
-    if (c == '(') {
-        return isBalanced(firstOpen, secondOpen + 1, thirdOpen, forthOpen, notValid, c);
-    }
-    if (c == '[') {
-        return isBalanced(firstOpen, secondOpen, thirdOpen + 1, forthOpen, notValid, c);
-    }
-    if (c == '{') {
-        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen + 1, notValid, c);
-    }
+    // Handle opening parentheses
+    if (c == '<') return task3ParenthesisValidator(open1 + 1, open2, open3, open4, error, last);
+    if (c == '(') return task3ParenthesisValidator(open1, open2 + 1, open3, open4, error, last);
+    if (c == '[') return task3ParenthesisValidator(open1, open2, open3 + 1, open4, error, last);
+    if (c == '{') return task3ParenthesisValidator(open1, open2, open3, open4 + 1, error, last);
 
+    // Handle closing parentheses
     if (c == '>') {
-        if (lastOpen == '<' || lastOpen == 0) {
-            if (firstOpen > 0) {
-                return isBalanced(firstOpen - 1, secondOpen, thirdOpen, forthOpen, notValid, 0);
-            }
-        }
-        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+        if (open1 > 0) return task3ParenthesisValidator(open1 - 1, open2, open3, open4, error, last);
+        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
     }
     if (c == ')') {
-        if (lastOpen == '(' || lastOpen == 0) {
-            if (secondOpen > 0) {
-                return isBalanced(firstOpen, secondOpen - 1, thirdOpen, forthOpen, notValid, 0);
-            }
-        }
-        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+        if (open2 > 0) return task3ParenthesisValidator(open1, open2 - 1, open3, open4, error, last);
+        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
     }
     if (c == ']') {
-        if (lastOpen == '[' || lastOpen == 0) {
-            if (thirdOpen > 0) {
-                return isBalanced(firstOpen, secondOpen, thirdOpen - 1, forthOpen, notValid, 0);
-            }
-        }
-        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+        if (open3 > 0) return task3ParenthesisValidator(open1, open2, open3 - 1, open4, error, last);
+        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
     }
     if (c == '}') {
-        if (lastOpen == '{' || lastOpen == 0) {
-            if (forthOpen > 0) {
-                return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen - 1, notValid, 0);
-            }
-        }
-        return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid + 1, 0);
+        if (open4 > 0) return task3ParenthesisValidator(open1, open2, open3, open4 - 1, error, last);
+        return task3ParenthesisValidator(open1, open2, open3, open4, error + 1, last);
     }
 
-    return isBalanced(firstOpen, secondOpen, thirdOpen, forthOpen, notValid, lastOpen);
+    // Ignore non-parenthesis characters
+    return task3ParenthesisValidator(open1, open2, open3, open4, error, last);
 }
 
-void task3ParenthesisValidation() {
-    printf("Please enter a term for validation:\n");
 
-    // Discard leftover newline characters in the buffer
-    char c;
-    while (scanf("%c", &c) == 1 && c == '\n');
 
-    // Start the validation
-    int result = isBalanced(0, 0, 0, 0, 0, 0);
-
-    if (result == 1) {
-        printf("The parentheses are balanced correctly.\n");
-    } else {
-        printf("The parentheses are not balanced correctly.\n");
-    }
-}
 
 
 
@@ -186,9 +153,18 @@ int main()
             case 2:
                  task2HumanPyramid();
                 break;
-            case 3:
-                 task3ParenthesisValidation();
-                 break;
+            case 3: {
+                    printf("Please enter a term for validation:\n");
+                    scanf(" ");
+                    int isClosed=task3ParenthesisValidator(0,0,0,0,0,0);
+
+                    if (isClosed==1) {
+                        printf("The parentheses are balanced correctly.\n");
+                    } else {
+                        printf("The parentheses are not balanced correctly.\n");
+                    }
+                    break;
+            }
             // case 4:
             //     task4QueensBattle();
             //     break;
