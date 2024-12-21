@@ -61,7 +61,7 @@ void task2HumanPyramid() {
     double weights[SIZE]; // arr for the 15 cheerleader
 
     // getting the values from the user
-    printf("Please enter the weights of the cheerleaders:\n");
+    printf("Please enter the weights of the cheerleaders: \n");
     for (int i = 0; i < SIZE; i++) {
         scanf("%lf", &weights[i]);
         if (weights[i] < 0) { // check if any value is neg
@@ -71,7 +71,7 @@ void task2HumanPyramid() {
     }
 
     // calculate the weights with the recursive func
-    printf("The total weight on each cheerleader is:\n");
+    printf("The total weight on each cheerleader is: \n");
     for (int row = 0, index = 0; row < 5; row++) {
         for (int col = 0; col <= row; col++, index++) {
             double totalWeight = calculateWeight(row, col, weights);
@@ -135,9 +135,9 @@ void task3ParenthesisValidator() {
 
     // Call the recursive function to validate the input
     if (isBalanced(stack, 0)) {
-        printf("The parentheses are balanced correctly.\n");
+        printf("\nThe parentheses are balanced correctly.\n");
     } else {
-        printf("The parentheses are not balanced correctly.\n");
+        printf("\nThe parentheses are not balanced correctly.\n");
     }
 }
 
