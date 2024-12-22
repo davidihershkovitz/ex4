@@ -194,10 +194,10 @@ int placeQueen(int row) {
 
 // Main task function
 void task4QueensBattle() {
-    printf("Please enter the board dimensions: ");
+    printf("Please enter the board dimensions:\n");
     scanf("%d", &N);
 
-    printf("Please enter a %d*%d puzzle board: ", N, N);
+    printf("Please enter a %d*%d puzzle board:\n", N, N);
     for (int i = 0; i < N; i++) {
         scanf("%s", board[i]); // Read each row of the board
     }
