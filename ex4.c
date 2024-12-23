@@ -122,6 +122,7 @@ int task3ParenthesisValidator(int first, int second, int third, int forth, int i
 }
 
 
+
 // Function to initialize all necessary tracking arrays
 void initialize(int colOccupied[], int areaUsed[], int diag1[], int diag2[], char solution[MAX_SIZE][MAX_SIZE], int N) {
     for (int i = 0; i < N; i++) {
@@ -153,40 +154,44 @@ int checkSafe(int row, int col, char area, int colOccupied[], int areaUsed[], in
     return 1;
 }
 
-// Recursive function to place queens
-int placeQueen(int row, char board[MAX_SIZE][MAX_SIZE], char solution[MAX_SIZE][MAX_SIZE], int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int diag1[2 * MAX_SIZE], int diag2[2 * MAX_SIZE], int N) {
+// Recursive function to place queens in the solution board
+int placeQueen(int row, int col, char board[MAX_SIZE][MAX_SIZE], char solution[MAX_SIZE][MAX_SIZE],
+               int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int diag1[2 * MAX_SIZE],
+               int diag2[2 * MAX_SIZE], int N) {
+    // If we have placed queens in all rows, return true
     if (row == N) {
-        return 1; // All queens successfully placed
+        return 1;
     }
 
-    for (int col = 0; col < N; col++) {
-        char area = board[row][col];
-        // Check if the placement is safe
-        int valid = checkSafe(row, col, area, colOccupied, areaUsed, diag1, diag2, N);
+    // Try to place a queen in the current row (recursively try each column)
+    if (col == N) {
+        return 0; // All columns have been tried, backtrack to the previous row
+    }
 
-        if (valid) {
-            // Place queen
-            solution[row][col] = 'X';
-            colOccupied[col] = 1;
-            areaUsed[(int)area] = 1;
-            diag1[row - col + N - 1] = row;
-            diag2[row + col] = row;
+    char area = board[row][col];
+    if (checkSafe(row, col, area, colOccupied, areaUsed, diag1, diag2, N)) {
+        // Place the queen on the board
+        solution[row][col] = 'X';
+        colOccupied[col] = 1;
+        areaUsed[(int)area] = 1;
+        diag1[row - col + N - 1] = row;
+        diag2[row + col] = row;
 
-            // Recursively place the next queen
-            if (placeQueen(row + 1, board, solution, colOccupied, areaUsed, diag1, diag2, N)) {
-                return 1;
-            }
-
-            // Backtrack: Remove queen
-            solution[row][col] = '*';
-            colOccupied[col] = 0;
-            areaUsed[(int)area] = 0;
-            diag1[row - col + N - 1] = -1;
-            diag2[row + col] = -1;
+        // Recursively place the next queen in the next column
+        if (placeQueen(row + 1, 0, board, solution, colOccupied, areaUsed, diag1, diag2, N)) {
+            return 1; // Queen placed successfully
         }
+
+        // Backtrack: remove the queen and try the next column
+        solution[row][col] = '*';
+        colOccupied[col] = 0;
+        areaUsed[(int)area] = 0;
+        diag1[row - col + N - 1] = -1;
+        diag2[row + col] = -1;
     }
 
-    return 0; // No valid placement for this row
+    // Recursively try the next column in the current row
+    return placeQueen(row, col + 1, board, solution, colOccupied, areaUsed, diag1, diag2, N);
 }
 
 // Main task function
@@ -205,7 +210,7 @@ void task4QueensBattle() {
     int colOccupied[MAX_SIZE], areaUsed[ASCII_SIZE], diag1[2 * MAX_SIZE], diag2[2 * MAX_SIZE];
     initialize(colOccupied, areaUsed, diag1, diag2, solution, N); // Initialize variables and solution
 
-    if (placeQueen(0, board, solution, colOccupied, areaUsed, diag1, diag2, N)) {
+    if (placeQueen(0, 0, board, solution, colOccupied, areaUsed, diag1, diag2, N)) {
         printf("Solution:\n");
         for (int i = 0; i < N; i++) {
             for (int j = 0; j < N; j++) {
