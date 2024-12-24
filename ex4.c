@@ -343,7 +343,7 @@ int tryWords(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictiona
 {
     if (wordIdx >= wordCount) return 0; // No more words to try
 
-    if (!usedWords[wordIdx] && strlen(dictionary[wordIdx]) == slots[slotIdx].length)
+    if (!usedWords[wordIdx] && (int)strlen(dictionary[wordIdx]) == slots[slotIdx].length)
     {
         if (canPlaceWord(grid, slots, slotIdx, dictionary[wordIdx], 0))
         {
