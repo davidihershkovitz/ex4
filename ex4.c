@@ -394,7 +394,7 @@ void printGrid(char grid[MAX_GRID][MAX_GRID], int gridSize)
     }
 }
 
-// Main crossword puzzle function that handles the recursion
+// Main crossword puzzle function for handling the recursion
 void task5CrosswordGenerator()
 {
     int gridSize, slotCount, wordCount;
