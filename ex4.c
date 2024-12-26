@@ -19,7 +19,7 @@ typedef struct Slot
     int row;
     int col;
     int length;
-    char direction; // 'H' for horizontal, 'V' for vertical
+    char direction; // H for horizontal, V for vertical
 } Slot;
 // All the functions that I used during the exe
 int paths(int x, int y);
@@ -76,7 +76,7 @@ void task1RobotPaths()
 {
     int x, y;
     printf("Please enter the coordinates of the robot (column, row): \n");
-    scanf("%d %d", &x, &y);
+    scanf(" %d  %d", &x, &y);
     int totalPaths = paths(x, y);
     printf("The total number of paths the robot can take to reach home is: %d\n", totalPaths);
 }
