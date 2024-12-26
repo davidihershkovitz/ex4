@@ -13,6 +13,37 @@ Assignment: ex4
 #define MAX_WORDS 100 // Max words in the dictionary
 #define MAX_LENGTH 15 // Max length of word
 
+// struct for the crosswords
+typedef struct Slot
+{
+    int row;
+    int col;
+    int length;
+    char direction; // 'H' for horizontal, 'V' for vertical
+} Slot;
+// All the functions that I used during the exe
+int paths(int x, int y);
+void task1RobotPaths();
+float calculateWeight(int row, int col, const float weights[]);
+void task2HumanPyramid();
+int task3ParenthesisValidator(int first, int second, int third, int forth, int invalid, char lastChar);
+void initialize(int colOccupied[], int areaUsed[], int diag1[], int diag2[], char solution[MAX_SIZE][MAX_SIZE], int N);
+int checkSafe(int row, int col, char area, int colOccupied[], int areaUsed[], int diag1[], int diag2[], int N);
+int placeQueen(int row, int col, char board[MAX_SIZE][MAX_SIZE], char solution[MAX_SIZE][MAX_SIZE],
+               int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int diag1[2 * MAX_SIZE],
+               int diag2[2 * MAX_SIZE], int N);
+void task4QueensBattle();
+void initializeGrid(char grid[MAX_GRID][MAX_GRID], int gridSize);
+int canPlaceWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos);
+void placeWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos,
+               int placeFlag);
+int tryWords(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
+             int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx, int wordIdx);
+int solveCrossword(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
+                   int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx);
+void printGrid(char grid[MAX_GRID][MAX_GRID], int gridSize);
+void task5CrosswordGenerator();
+
 
 // Recursive func that will check how many ways there are to get to the destination
 int paths(int x, int y)
@@ -270,26 +301,6 @@ void task4QueensBattle()
     }
 }
 
-// struct for the crosswords
-typedef struct
-{
-    int row;
-    int col;
-    int length;
-    char direction; // 'H' for horizontal, 'V' for vertical
-} Slot;
-
-// Function declarations
-void initializeGrid(char grid[MAX_GRID][MAX_GRID], int gridSize);
-int canPlaceWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos);
-void placeWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos,
-               int placeFlag);
-int tryWords(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
-             int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx, int wordIdx);
-int solveCrossword(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
-                   int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx);
-void printGrid(char grid[MAX_GRID][MAX_GRID], int gridSize);
-void crosswordPuzzle();
 
 // Initialize the grid with '#'
 void initializeGrid(char grid[MAX_GRID][MAX_GRID], int gridSize)
@@ -311,8 +322,8 @@ int canPlaceWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotI
     int r = slots[slotIdx].row;
     int c = slots[slotIdx].col;
 
-    if (slots[slotIdx].direction == 'H') c += pos; // Horizontal
-    else r += pos; // Vertical
+    if (slots[slotIdx].direction == 'H') c += pos; // Go horizontal
+    else r += pos; // Go vertical
 
     if (grid[r][c] != '#' && grid[r][c] != word[pos]) return 0; // Error
 
