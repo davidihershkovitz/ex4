@@ -27,22 +27,13 @@ void task1RobotPaths();
 float calculateWeight(int row, int col, const float weights[]);
 void task2HumanPyramid();
 int task3ParenthesisValidator(int first, int second, int third, int forth, int invalid, char lastChar);
-void initialize(int colOccupied[], int areaUsed[], int diag1[], int diag2[], char solution[MAX_SIZE][MAX_SIZE], int N);
-int checkSafe(int row, int col, char area, int colOccupied[], int areaUsed[], int diag1[], int diag2[], int N);
+void initialize(int colOccupied[], int areaUsed[], char solution[MAX_SIZE][MAX_SIZE], int N);
+int is_neighbor_has_queen(int row, int col, int dr, int dc, char solution[MAX_SIZE][MAX_SIZE], int N);
+int check_neighbors(int row, int col, char solution[MAX_SIZE][MAX_SIZE], int N, int d);
+int checkSafe(int row, int col, char area, int colOccupied[], int areaUsed[], char solution[MAX_SIZE][MAX_SIZE], int N);
 int placeQueen(int row, int col, char board[MAX_SIZE][MAX_SIZE], char solution[MAX_SIZE][MAX_SIZE],
-               int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int diag1[2 * MAX_SIZE],
-               int diag2[2 * MAX_SIZE], int N);
+               int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int N);
 void task4QueensBattle();
-void initializeGrid(char grid[MAX_GRID][MAX_GRID], int gridSize);
-int canPlaceWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos);
-void placeWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos,
-               int placeFlag);
-int tryWords(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
-             int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx, int wordIdx);
-int solveCrossword(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
-                   int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx);
-void printGrid(char grid[MAX_GRID][MAX_GRID], int gridSize);
-void task5CrosswordGenerator();
 
 
 // Recursive func that will check how many ways there are to get to the destination
@@ -183,88 +174,70 @@ int task3ParenthesisValidator(int first, int second, int third, int forth, int i
 
 
 // Function to initialize all necessary tracking arrays
-void initialize(int colOccupied[], int areaUsed[], int diag1[], int diag2[], char solution[MAX_SIZE][MAX_SIZE], int N)
+void initialize(int colOccupied[], int areaUsed[], char solution[MAX_SIZE][MAX_SIZE], int N)
 {
     for (int i = 0; i < N; i++)
     {
-        colOccupied[i] = 0; // Mark columns as free
+        colOccupied[i] = 0;
         for (int j = 0; j < N; j++)
-        {
-            solution[i][j] = '*'; // Set all cells to '*'
-        }
+            solution[i][j] = '*';
     }
     for (int i = 0; i < ASCII_SIZE; i++)
-    {
-        areaUsed[i] = 0; // Mark areas as free
-    }
-    for (int i = 0; i < 2 * MAX_SIZE; i++)
-    {
-        diag1[i] = -1; // Initialize diagonals
-        diag2[i] = -1;
-    }
+        areaUsed[i] = 0;
 }
 
-// Function to check if placing a queen is safe
-int checkSafe(int row, int col, char area, int colOccupied[], int areaUsed[], int diag1[], int diag2[], int N)
-{
-    int diag1Index = row - col + N - 1;
-    int diag2Index = row + col;
-
-    // Check if the column, area, or diagonals are already occupied
-    if (colOccupied[col] || areaUsed[(int)area] ||
-        (diag1[diag1Index] != -1 && row - diag1[diag1Index] <= 1) ||
-        (diag2[diag2Index] != -1 && row - diag2[diag2Index] <= 1))
-    {
-        return 0;
-    }
-    return 1;
+//help to check if the neighbor is a queen
+int is_neighbor_has_queen(int row, int col, int dr, int dc, char solution[MAX_SIZE][MAX_SIZE], int N) {
+    int nr = row + dr;
+    int nc = col + dc;
+    if (nr >= 0 && nr < N && nc >= 0 && nc < N)
+        return solution[nr][nc] == 'X';
+    return 0;
 }
-
-// Recursive function to place queens in the solution board
-int placeQueen(int row, int col, char board[MAX_SIZE][MAX_SIZE], char solution[MAX_SIZE][MAX_SIZE],
-               int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int diag1[2 * MAX_SIZE],
-               int diag2[2 * MAX_SIZE], int N)
-{
-    // If we have placed queens in all rows, return true
-    if (row == N)
-    {
+//check all adjacent neighbors
+int check_neighbors(int row, int col, char solution[MAX_SIZE][MAX_SIZE], int N, int d) {
+    int dr[8] = {-1,-1,-1,0,0,1,1,1};
+    int dc[8] = {-1,0,1,-1,1,-1,0,1};
+    if (d == 8)
         return 1;
-    }
+    if (is_neighbor_has_queen(row, col, dr[d], dc[d], solution, N))
+        return 0;
+    return check_neighbors(row, col, solution, N, d+1);
+}
+//main func to check if the place is safe
+int checkSafe(int row, int col, char area, int colOccupied[], int areaUsed[], char solution[MAX_SIZE][MAX_SIZE], int N)
+{
+    if (colOccupied[col] || areaUsed[(int)area])
+        return 0;
+    return check_neighbors(row, col, solution, N, 0);
+}
+//func that will place the queen
+int placeQueen(int row, int col, char board[MAX_SIZE][MAX_SIZE], char solution[MAX_SIZE][MAX_SIZE],
+               int colOccupied[MAX_SIZE], int areaUsed[ASCII_SIZE], int N)
+{
+    if (row == N)
+        return 1;
 
-    // Try to place a queen in the current row
     if (col == N)
-    {
-        return 0; // All columns have been tried, backtrack to the previous row
-    }
+        return 0;
 
     char area = board[row][col];
-    if (checkSafe(row, col, area, colOccupied, areaUsed, diag1, diag2, N))
+    if (checkSafe(row, col, area, colOccupied, areaUsed, solution, N))
     {
-        // Place the queen on the board
         solution[row][col] = 'X';
         colOccupied[col] = 1;
         areaUsed[(int)area] = 1;
-        diag1[row - col + N - 1] = row;
-        diag2[row + col] = row;
 
-        // Recursively place the next queen in the next column
-        if (placeQueen(row + 1, 0, board, solution, colOccupied, areaUsed, diag1, diag2, N))
-        {
+        if (placeQueen(row + 1, 0, board, solution, colOccupied, areaUsed, N))
             return 1;
-        }
 
         solution[row][col] = '*';
         colOccupied[col] = 0;
         areaUsed[(int)area] = 0;
-        diag1[row - col + N - 1] = -1;
-        diag2[row + col] = -1;
     }
-
-    // Recursively try the next column in the current row
-    return placeQueen(row, col + 1, board, solution, colOccupied, areaUsed, diag1, diag2, N);
+    return placeQueen(row, col + 1, board, solution, colOccupied, areaUsed, N);
 }
-
-// Main function to handle the recursive func
+//func that will initiate all the recursion
 void task4QueensBattle()
 {
     int N;
@@ -272,18 +245,17 @@ void task4QueensBattle()
     scanf("%d", &N);
 
     char solution[MAX_SIZE][MAX_SIZE];
-    int colOccupied[MAX_SIZE], areaUsed[ASCII_SIZE], diag1[2 * MAX_SIZE], diag2[2 * MAX_SIZE];
-    initialize(colOccupied, areaUsed, diag1, diag2, solution, N); // Initialize variables and solution
+    int colOccupied[MAX_SIZE], areaUsed[ASCII_SIZE];
+    initialize(colOccupied, areaUsed, solution, N);
 
     printf("Please enter a %d*%d puzzle board:\n", N, N);
     char board[MAX_SIZE][MAX_SIZE];
     for (int i = 0; i < N; i++)
     {
-        scanf("%s", board[i]); // Read each row of the board
+        scanf("%s", board[i]);
     }
 
-
-    if (placeQueen(0, 0, board, solution, colOccupied, areaUsed, diag1, diag2, N))
+    if (placeQueen(0, 0, board, solution, colOccupied, areaUsed, N))
     {
         printf("Solution:\n");
         for (int i = 0; i < N; i++)
@@ -301,147 +273,6 @@ void task4QueensBattle()
     }
 }
 
-
-// Initialize the grid with '#'
-void initializeGrid(char grid[MAX_GRID][MAX_GRID], int gridSize)
-{
-    for (int i = 0; i < gridSize; i++)
-    {
-        for (int j = 0; j < gridSize; j++)
-        {
-            grid[i][j] = '#';
-        }
-    }
-}
-
-// Check if a word can be placed in the slot
-int canPlaceWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos)
-{
-    if (pos >= slots[slotIdx].length) return 1; // Base case - Reached the end of the slot
-
-    int r = slots[slotIdx].row;
-    int c = slots[slotIdx].col;
-
-    if (slots[slotIdx].direction == 'H') c += pos; // Go horizontal
-    else r += pos; // Go vertical
-
-    if (grid[r][c] != '#' && grid[r][c] != word[pos]) return 0; // Error
-
-    return canPlaceWord(grid, slots, slotIdx, word, pos + 1); // Recurse to check the next character
-}
-
-// Place or remove a word in the slot
-void placeWord(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], int slotIdx, char word[MAX_LENGTH], int pos,
-               int placeFlag)
-{
-    if (pos >= slots[slotIdx].length) return; // Reached the end of the slot
-
-    int r = slots[slotIdx].row;
-    int c = slots[slotIdx].col;
-
-    if (slots[slotIdx].direction == 'H') c += pos; // Horizontal
-    else r += pos; // Vertical
-
-    if (placeFlag) grid[r][c] = word[pos]; // Place the character
-    else grid[r][c] = '#'; // Reset the cell if not placed
-
-    placeWord(grid, slots, slotIdx, word, pos + 1, placeFlag); // Recurse to place/un-place the next character
-}
-
-// Recursive function to try words for a specific slot
-int tryWords(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
-             int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx, int wordIdx)
-{
-    if (wordIdx >= wordCount) return 0; // No more words to try
-
-    if (!usedWords[wordIdx] && (int)strlen(dictionary[wordIdx]) == slots[slotIdx].length)
-    {
-        if (canPlaceWord(grid, slots, slotIdx, dictionary[wordIdx], 0))
-        {
-            usedWords[wordIdx] = 1; // Mark word as used
-            placeWord(grid, slots, slotIdx, dictionary[wordIdx], 0, 1); // Place the word
-
-            if (solveCrossword(grid, slots, dictionary, usedWords, gridSize, wordCount, slotCount, slotIdx + 1)) return
-                1;
-
-            usedWords[wordIdx] = 0; // Backtrack - unmark the word
-            placeWord(grid, slots, slotIdx, dictionary[wordIdx], 0, 0);
-        }
-    }
-    return tryWords(grid, slots, dictionary, usedWords, gridSize, wordCount, slotCount, slotIdx, wordIdx + 1);
-    // Try the next word
-}
-
-// Recursive function to solve the crossword
-int solveCrossword(char grid[MAX_GRID][MAX_GRID], Slot slots[MAX_WORDS], char dictionary[MAX_WORDS][MAX_LENGTH + 1],
-                   int usedWords[MAX_WORDS], int gridSize, int wordCount, int slotCount, int slotIdx)
-{
-    if (slotIdx >= slotCount) return 1; // Base case - All slots are filled
-    return tryWords(grid, slots, dictionary, usedWords, gridSize, wordCount, slotCount, slotIdx, 0);
-    // Start trying words for this slot
-}
-
-// Print the grid
-void printGrid(char grid[MAX_GRID][MAX_GRID], int gridSize)
-{
-    for (int i = 0; i < gridSize; i++)
-    {
-        for (int j = 0; j < gridSize; j++)
-        {
-            printf("| %c ", grid[i][j]);
-        }
-        printf("|\n");
-    }
-}
-
-// Main crossword puzzle function for handling the recursion
-void task5CrosswordGenerator()
-{
-    int gridSize, slotCount, wordCount;
-    char grid[MAX_GRID][MAX_GRID];
-    Slot slots[MAX_WORDS];
-    char dictionary[MAX_WORDS][MAX_LENGTH + 1];
-    int usedWords[MAX_WORDS] = {0};
-
-    printf("Please enter the dimensions of the crossword grid:\n");
-    scanf("%d", &gridSize);
-
-    printf("Please enter the number of slots in the crossword:\n");
-    scanf("%d", &slotCount);
-
-    printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
-    for (int i = 0; i < slotCount; i++)
-    {
-        scanf("%d %d %d %c", &slots[i].row, &slots[i].col, &slots[i].length, &slots[i].direction);
-    }
-
-    printf("Please enter the number of words in the dictionary:\n");
-    scanf("%d", &wordCount);
-    while (wordCount < slotCount)
-    {
-        printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n", slotCount);
-        scanf("%d", &wordCount);
-    }
-
-    printf("Please enter the words for the dictionary:\n");
-    for (int i = 0; i < wordCount; i++)
-    {
-        scanf("%s", dictionary[i]);
-    }
-
-    initializeGrid(grid, gridSize);
-
-    if (solveCrossword(grid, slots, dictionary, usedWords, gridSize, wordCount, slotCount, 0))
-    {
-        printGrid(grid, gridSize);
-    }
-    else
-    {
-        printf("This crossword cannot be solved.\n");
-    }
-}
-
-
 int main()
 {
     int task = -1;
@@ -452,14 +283,13 @@ int main()
             "2. The Human Pyramid\n"
             "3. Parenthesis Validation\n"
             "4. Queens Battle\n"
-            "5. Crossword Generator\n"
-            "6. Exit\n");
+            "5. Exit\n");
 // Each func is connected to the main
         if (scanf("%d", &task))
         {
             switch (task)
             {
-            case 6:
+            case 5:
                 printf("Goodbye!\n");
                 break;
             case 1:
@@ -486,9 +316,6 @@ int main()
             case 4:
                 task4QueensBattle();
                 break;
-            case 5:
-                task5CrosswordGenerator();
-                break;
             default:
                 printf("\nPlease choose a task number from the list.\n");
                 break;
@@ -499,5 +326,5 @@ int main()
             scanf("%*s");
         }
     }
-    while (task != 6);
+    while (task != 5);
 }
